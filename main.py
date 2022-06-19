@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +23,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+script_dir = os.path.dirname(__file__)
+static_path = os.path.join(script_dir, "static/")
+
+app.mount("/static", StaticFiles(directory=static_path), name="static")
 
 
 @app.get('/')
