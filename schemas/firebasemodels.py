@@ -1,6 +1,6 @@
 import datetime as _dt
 import os
-from typing import Union
+from typing import Optional, Union
 from uuid import UUID
 from pydantic import Field, BaseModel, EmailStr, HttpUrl, FilePath
 
@@ -35,7 +35,7 @@ Post_Model = {
 class Post(BaseModel):
     name: str
     body: str
-    image: str | None = None
+    image: Optional[str] = None
     user_id: str
 
 class PostIn(Post):
@@ -44,8 +44,8 @@ class PostIn(Post):
 class PostOut(Post):
     id: str
     date: _dt.datetime
-    like: list[str] | None = None
-    comment: list[CommentOut] | None = None
+    like: Optional[list[str]] = None
+    comment:Optional[list[CommentOut]] = None
 
     class Config:
         json_encoders = {
@@ -58,17 +58,17 @@ class JobIn(BaseModel):
     salary: str
     title: str
     job_description: str
-    requirements: str | None = None
+    requirements: Optional[str] = None
     location: str
-    image: str | None = None
+    image: Optional[str] = None
     company_name: str
-    job_type: str | None = None
-    link: str | None = None
+    job_type: Optional[str] = None
+    link: Optional[str] = None
     
 
 class JobOut(JobIn):
-    likes: list[str] | None = None
-    comments: list[CommentOut] | None = None
+    likes: Optional[list[str]]= None
+    comments: Optional[list[CommentOut]]= None
     id: str
     date: _dt.datetime
 
@@ -87,8 +87,8 @@ class Contact(BaseModel):
     phone: int
     address: str
     location: str
-    company_name: str | None = None
-    socials: list[Socials] | None = None
+    company_name: Optional[str] = None
+    socials: Optional[list[Socials]]= None
 
 
 class ContactIn(Contact):
@@ -122,8 +122,8 @@ class UserRecord(BaseModel):
     place_of_work: str
 
 class User(BaseModel):
-    profile: UserProfile | None = None
-    record: UserRecord | None = None
+    profile: Optional[UserProfile] = None
+    record: Optional[UserRecord] = None
 
 class Finduser(BaseModel):
     name: str

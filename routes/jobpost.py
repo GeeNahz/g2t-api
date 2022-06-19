@@ -1,6 +1,7 @@
 import datetime as _dt
 import shutil
 import secrets
+from typing import Optional
 from PIL import Image
 from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Request
 from pydantic import ValidationError
@@ -94,7 +95,7 @@ async def fetch_all_job_posts():
 async def update_job_post(
     post_id: str,
     request: Request,
-    position: str | None = Form(None), salary: str | None = Form(None), title: str | None = Form(None), job_description: str | None = Form(None), requirements: str | None = Form(None), company_name: str | None = Form(None), location: str | None = Form(None), job_type: str | None = Form(None), link: str | None = Form(None), image: UploadFile | None = File(None),
+    position: Optional[str] = Form(None), salary: Optional[str] = Form(None), title: Optional[str] = Form(None), job_description: Optional[str] = Form(None), requirements: Optional[str] = Form(None), company_name: Optional[str] = Form(None), location: Optional[str] = Form(None), job_type: Optional[str] = Form(None), link: Optional[str] = Form(None), image: Optional[UploadFile] = File(None),
     ):
 
     """

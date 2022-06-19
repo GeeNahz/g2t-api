@@ -1,5 +1,6 @@
 import datetime as _dt
 import secrets
+from typing import Optional
 from fastapi import APIRouter, HTTPException, status, Request, Form, UploadFile, File
 
 from PIL import Image
@@ -77,10 +78,10 @@ async def fetch_all_posts(): # changed
 @router.put('/{post_id}/') # => remember, include the response model
 async def update_post(post_id: str,
                       request: Request,
-                      name: str | None = Form(None),
-                      body: str | None = Form(None),
-                      image: UploadFile | None = File(None),
-                      user_id: str | None = Form(None)):
+                      name: Optional[str] = Form(None),
+                      body: Optional[str] = Form(None),
+                      image: Optional[UploadFile] = File(None),
+                      user_id: Optional[str] = Form(None)):
     old_data = Manager().get_one(collection='post', uid=post_id)
     if not old_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
