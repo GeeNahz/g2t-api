@@ -1,6 +1,6 @@
 import datetime as _dt
 import os
-from typing import Optional, Union
+from typing import Optional, List, Union
 from uuid import UUID
 from pydantic import Field, BaseModel, EmailStr, HttpUrl, FilePath
 
@@ -44,8 +44,8 @@ class PostIn(Post):
 class PostOut(Post):
     id: str
     date: _dt.datetime
-    like: Optional[list[str]] = None
-    comment:Optional[list[CommentOut]] = None
+    like: Optional[List[str]] = None
+    comment:Optional[List[CommentOut]] = None
 
     class Config:
         json_encoders = {
@@ -67,8 +67,8 @@ class JobIn(BaseModel):
     
 
 class JobOut(JobIn):
-    likes: Optional[list[str]]= None
-    comments: Optional[list[CommentOut]]= None
+    likes: Optional[List[str]]= None
+    comments: Optional[List[CommentOut]]= None
     id: str
     date: _dt.datetime
 
@@ -88,7 +88,7 @@ class Contact(BaseModel):
     address: str
     location: str
     company_name: Optional[str] = None
-    socials: Optional[list[Socials]]= None
+    socials: Optional[List[Socials]]= None
 
 
 class ContactIn(Contact):
@@ -132,6 +132,3 @@ class Finduser(BaseModel):
 
 class Message(BaseModel):
     message: str
-
-
-# BASE_DIR = os.path.dirname(os.path.realpath(__file__))
