@@ -9,14 +9,19 @@ from pydantic import Field, BaseModel, EmailStr, HttpUrl, FilePath
 # -> date updated 
 
 class Comment(BaseModel):
-    date: _dt.time
     comment: str
 
 class CommentIn(Comment):
     pass
 
 class CommentOut(CommentIn):
-    user_id: int
+    date: _dt.datetime
+    user_id: str
+
+    class Config:
+        json_encoders = {
+            _dt.datetime: lambda v: v.timestamp(),
+        }
 
 
 Post_Model = {

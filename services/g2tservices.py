@@ -97,7 +97,13 @@ class Manager:
 
 
     def create_comments(self, collection: str, uid: str, comment_obj: dict):
-        self.__db.collection(collection).document(uid).collection("comment").add(comment_obj)
+        # data = {
+        #     "comment": comment_obj
+        # }
+        # self.__db.collection(collection).document(uid).set(data, merge=True)
+        self.__db.collection(collection).document(uid).update(
+            {"comment": firestore.ArrayUnion([comment_obj])})
+            
         return "Success"
 
 
@@ -114,17 +120,17 @@ class Manager:
 
 
     def like_unlike(self, collection: str, uid: str, post_id: str):
-        likes = self.__db.collection(collection).document(post_id).get().to_dict().get('likes')
+        likes = self.__db.collection(collection).document(post_id).get().to_dict().get('like')
         if isinstance(likes, list):
             if uid in likes:
                 self.__db.collection(collection).document(post_id).update(
-                            {"likes": firestore.ArrayRemove([uid])})
+                            {"like": firestore.ArrayRemove([uid])})
             else:
                 self.__db.collection(collection).document(post_id).update(
-                            {"likes": firestore.ArrayUnion([uid])})
+                            {"like": firestore.ArrayUnion([uid])})
         else:
             self.__db.collection(collection).document(post_id).update(
-                        {"likes": firestore.ArrayUnion([uid])})
+                        {"like": firestore.ArrayUnion([uid])})
         return "Success"
 
 

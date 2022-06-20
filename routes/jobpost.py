@@ -26,7 +26,7 @@ job description
 
 
 async def process_image(img, req) -> str:
-    MEDIA_DIR = "./static/image/"
+    MEDIA_DIR = "./static/media/"
     media_types = ['jpeg', 'png', 'jpg']
     
     file_name = img.filename
@@ -51,7 +51,7 @@ async def process_image(img, req) -> str:
     image = image.resize(size=(600, 600))
     image.save(generated_image_name)
 
-    img.close()
+    await img.close()
     return url
 
 
@@ -102,13 +102,13 @@ async def update_job_post(
     Updates a job post that corresponds to the job post id provided
     """
 
-    old_post = Manager().get_one(collection='jobpost', uid=post_id)
+    old_post = Manager().get_one(collection='jobpost', uid=post_id)[0]
 
     if not old_post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Job post not found. Check the id and try again.")
 
-    new_url = await process_image(image=image, request=request) if image else old_post.get('image')
+    new_url = await process_image(img=image, req=request) if image else old_post.get('image')
 
     new_position = position if position else old_post.get('position')
     new_salary = salary if salary else old_post.get('salary')
@@ -133,29 +133,22 @@ async def update_job_post(
     return Message(message="Successfully updated the record.")
 
 
-@router.post('/comment/{post_id}/', response_model=CommentOut)
-async def create_comment_post(post_id: str, comment: CommentIn):
+@router.post('/comment/{post_id}/{user_id}', response_model=CommentOut)
+async def create_comment_post(post_id: str, user_id: str, comment: CommentIn):
     """
     Create a comment for a job post
     """
+    date_created = _dt.datetime.timestamp(_dt.datetime.utcnow())
+
     is_valid = Manager().validate(collection='jobpost', document=post_id)
     if is_valid:
-        new_comment = {**comment.dict()}
+        new_comment = {**comment.dict(), "date": date_created,
+                       "user_id": user_id}
         is_updated = Manager().create_comments(collection='jobpost', uid=post_id, comment_obj=new_comment)
         return is_updated
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Job post not found. Check the id and try again.")
-
-
-@router.get('/comment/all')
-async def read_comment_post(post_id: str):
-    all_comments = Manager().get_comments(collection='jobpost', uid=post_id)
-    if not all_comments:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No comments available. Create some and try again.")
-    else:
-        return all_comments
 
 
 @router.get('/like/{post_id}/{uuid}', response_model=Message)

@@ -18,7 +18,7 @@ router = APIRouter(
 
 
 async def process_image(img, req) -> str:
-    MEDIA_DIR = "./static/image/"
+    MEDIA_DIR = "./static/media/"
     media_types = ['jpeg', 'png', 'jpg']
 
     file_name = img.filename
@@ -56,7 +56,7 @@ async def create_post(
     user_id: str = Form(...)
 ): # changed
 
-    url = await process_image(image=image, request=request)
+    url = await process_image(img=image, req=request)
 
     post = PostIn(name=name, body=body, image=url, user_id=user_id)
 
@@ -82,12 +82,12 @@ async def update_post(post_id: str,
                       body: Optional[str] = Form(None),
                       image: Optional[UploadFile] = File(None),
                       user_id: Optional[str] = Form(None)):
-    old_data = Manager().get_one(collection='post', uid=post_id)
+    old_data = Manager().get_one(collection='post', uid=post_id)[0]
     if not old_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Post not found. Check the post id and try again.")
 
-    url = await process_image(image=image, request=request) if image else old_data['image']
+    url = await process_image(img=image, req=request) if image else old_data.get('image')
 
     new_name = name if name else old_data.get('name')
     new_body = body if body else old_data.get('body')
@@ -112,11 +112,13 @@ async def delete_post(post_id: str):
     return Message(message="Successfully Deleted")
 
 
-@router.post('/comment/{post_id}/', response_model=Message)
-async def create_comment_post(post_id: str, comment: CommentIn): # changed
+@router.post('/comment/{post_id}/{user_id}', response_model=Message)
+async def create_comment_post(post_id: str, user_id: str, comment: CommentIn): # changed
+    date_created = _dt.datetime.timestamp(_dt.datetime.utcnow())
+
     is_valid = Manager().validate(collection="post", document=post_id)
     if is_valid:
-        new_comment = {**comment.dict()}
+        new_comment = {**comment.dict(), "date": date_created, "user_id": user_id}
 
         is_updated = Manager().create_comments(collection='post', uid=post_id, comment_obj=new_comment)
         return Message(message="Comment was created successfully")
