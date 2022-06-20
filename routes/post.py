@@ -1,6 +1,6 @@
 import datetime as _dt
 import secrets
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, HTTPException, status, Request, Form, UploadFile, File
 
 from PIL import Image
@@ -67,7 +67,7 @@ async def create_post(
     return create_post
 
 
-@router.get('/all/', response_model=list[PostOut])
+@router.get('/all/', response_model=List[PostOut])
 async def fetch_all_posts(): # changed
     posts = Manager().get_all(collection='post')
     if not posts:

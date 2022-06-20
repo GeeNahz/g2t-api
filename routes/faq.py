@@ -1,4 +1,5 @@
 import datetime as _dt
+from typing import List
 from fastapi import APIRouter, HTTPException, status
 
 from services.g2tservices import Manager
@@ -18,7 +19,7 @@ async def create_faq(faq: Faq):
     return posted
 
 
-@router.get('/all/', response_model=list[Faq])
+@router.get('/all/', response_model=List[Faq])
 async def fetch_all_faqs():
     faqs = Manager().get_all(collection='faq')
     if not faqs:

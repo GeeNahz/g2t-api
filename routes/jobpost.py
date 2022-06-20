@@ -1,7 +1,7 @@
 import datetime as _dt
 import shutil
 import secrets
-from typing import Optional
+from typing import Optional, List
 from PIL import Image
 from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Request
 from pydantic import ValidationError
@@ -82,7 +82,7 @@ async def create_job(request: Request,
     return Manager().create(collection='jobpost', data_obj=job)
 
 
-@router.get('/all/', response_model=list[JobOut])
+@router.get('/all/', response_model=List[JobOut])
 async def fetch_all_job_posts():
     job_posts = Manager().get_all(collection='jobpost')
     if not job_posts:

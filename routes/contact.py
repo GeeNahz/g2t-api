@@ -1,4 +1,5 @@
 import datetime as _dt
+from typing import List
 from fastapi import APIRouter, HTTPException, status
 
 from schemas.firebasemodels import ContactIn, ContactOut
@@ -22,7 +23,7 @@ async def create_contact(contact: ContactIn):
     return posted
 
 
-@router.get('/all/', response_model=list[ContactOut])
+@router.get('/all/', response_model=List[ContactOut])
 async def fetch_all_contacts():
     contacts = Manager().get_all(collection='contact')
     if not contacts:

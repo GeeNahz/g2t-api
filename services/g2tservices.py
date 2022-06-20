@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import List, Union
 from dotenv import load_dotenv
 
 import firebase_admin
@@ -54,7 +54,7 @@ class Manager:
         return "Success"
 
 
-    def get_all(self, collection: str) -> Union[list, bool]:
+    def get_all(self, collection: str) -> Union[List, bool]:
         docs = self.__db.collection(collection).get()
         all_docs = []
         if len(docs) < 1:
