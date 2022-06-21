@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 import firebase_admin
 from firebase_admin import credentials, firestore
-from firebase_admin.exceptions import FirebaseError
+# from firebase_admin.exceptions import FirebaseError
 
 
 load_dotenv()
@@ -97,10 +97,6 @@ class Manager:
 
 
     def create_comments(self, collection: str, uid: str, comment_obj: dict):
-        # data = {
-        #     "comment": comment_obj
-        # }
-        # self.__db.collection(collection).document(uid).set(data, merge=True)
         self.__db.collection(collection).document(uid).update(
             {"comment": firestore.ArrayUnion([comment_obj])})
             
@@ -138,7 +134,7 @@ class Manager:
         items_list = []
         is_valid = self.validate(collection=collection)
         if is_valid:
-            for key, value in kwargs.items():
+            for value, key in kwargs.items():
                 items_list = []
                 docs = self.__db.collection(collection).where(key, "==", value).get()
                 for doc in docs:

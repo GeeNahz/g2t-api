@@ -8,7 +8,9 @@ from pydantic import ValidationError
 
 from services.g2tservices import Manager
 
-from schemas.firebasemodels import CommentIn, CommentOut, JobOut, Message, JobIn
+from schemas.firebasemodels import Message
+from schemas.jobpost_schema import JobIn, JobOut
+from schemas.comment_schema import CommentIn, CommentOut
 
 
 router = APIRouter(
@@ -62,6 +64,7 @@ async def create_job(request: Request,
                      requirements: str = Form(...), company_name: str = Form(...),
                      location: str = Form(...), job_type: str = Form(...),
                      link: str = Form(...), image: UploadFile = File(...)):
+    """Create a new job post"""
 
     url = await process_image(img=image, req=request)
     try:
@@ -84,13 +87,14 @@ async def create_job(request: Request,
 
 @router.get('/all/', response_model=List[JobOut])
 async def fetch_all_job_posts():
+    """Fetch all job posts"""
     job_posts = Manager().get_all(collection='jobpost')
     if not job_posts:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No job posts available. Create some and try again.")
     return job_posts
 
-# Updated
+
 @router.put('/post/{post_id}/', response_model=Message)
 async def update_job_post(
     post_id: str,
@@ -99,7 +103,7 @@ async def update_job_post(
     ):
 
     """
-    Updates a job post that corresponds to the job post id provided
+    Update a job post that corresponds to the job post id provided
     """
 
     old_post = Manager().get_one(collection='jobpost', uid=post_id)[0]

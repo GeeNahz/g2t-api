@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from services.g2tservices import Manager
 
-from schemas.firebasemodels import User, Finduser
+from schemas.user_schema import User, Finduser
 
 
 router = APIRouter(
@@ -15,7 +15,7 @@ router = APIRouter(
 async def get_profile_and_record(p_uuid: str, r_uuid: str):
     """This may not work because either profile or record collection is not available
 
-    Receives user id for profile and user id for record and returns their data
+    Receives user id for profile as p_uuid and user id for record as r_uuid then returns their data
     """
     
     is_valid_profile = Manager().validate(collection='profiles', document=p_uuid)
@@ -40,7 +40,8 @@ async def get_profile_and_record(p_uuid: str, r_uuid: str):
 
 @router.get('/getusers/{db_filter}/{query}')
 async def filter_items(query: str, db_filter: str):
-    """Yet to conclude this endpoint"""
+    """db_filter -> what field to search from
+    query -> what value to search for"""
 
     some_obj = Manager().filter_db(collection='profiles', **{db_filter:query}) 
     if (not some_obj) or (len(some_obj) < 1):

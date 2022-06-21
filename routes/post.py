@@ -8,7 +8,9 @@ from pydantic import ValidationError
 
 from services.g2tservices import Manager
 
-from schemas.firebasemodels import PostIn, PostOut, CommentIn, CommentOut, Message
+from schemas.firebasemodels import Message
+from schemas.post_schema import PostIn, PostOut
+from schemas.comment_schema import CommentIn
 
 
 router = APIRouter(
@@ -55,6 +57,7 @@ async def create_post(
     image: UploadFile = File(...),
     user_id: str = Form(...)
 ): # changed
+    """Create a new post"""
 
     url = await process_image(img=image, req=request)
 
@@ -69,6 +72,7 @@ async def create_post(
 
 @router.get('/all/', response_model=List[PostOut])
 async def fetch_all_posts(): # changed
+    """Fetch all posts"""
     posts = Manager().get_all(collection='post')
     if not posts:
         raise HTTPException(
@@ -82,6 +86,7 @@ async def update_post(post_id: str,
                       body: Optional[str] = Form(None),
                       image: Optional[UploadFile] = File(None),
                       user_id: Optional[str] = Form(None)):
+    """Update a post that corresponds to the provided post id"""
     old_data = Manager().get_one(collection='post', uid=post_id)[0]
     if not old_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -105,6 +110,7 @@ async def update_post(post_id: str,
 
 @router.delete('/del/{post_id}/', response_model=Message)
 async def delete_post(post_id: str):
+    """Delete post that corresponds to the provided post id"""
     deleted_post = Manager().delete(collection='post', uid=post_id)
     if not deleted_post:
         raise HTTPException(
@@ -114,6 +120,7 @@ async def delete_post(post_id: str):
 
 @router.post('/comment/{post_id}/{user_id}', response_model=Message)
 async def create_comment_post(post_id: str, user_id: str, comment: CommentIn): # changed
+    """Create a comment for a post if it exists. A user id for the user creating the post is also required"""
     date_created = _dt.datetime.timestamp(_dt.datetime.utcnow())
 
     is_valid = Manager().validate(collection="post", document=post_id)
@@ -127,12 +134,12 @@ async def create_comment_post(post_id: str, user_id: str, comment: CommentIn): #
             status_code=status.HTTP_404_NOT_FOUND, detail="Post not found. Check the post id and try again.")
 
 
-
-@router.get('/like/{post_id}/{uuid}', response_model=Message)
-async def like_post(post_id: str, uuid: str): # changed
+@router.get('/like/{post_id}/{user_id}', response_model=Message)
+async def like_post(post_id: str, user_id: str): # changed
+    """Like or dislike a post. user_id is required"""
     is_valid = Manager().validate(collection='post', document=post_id)
     if is_valid:
-        Manager().like_unlike(collection='post', uid=uuid, post_id=post_id)
+        Manager().like_unlike(collection='post', uid=user_id, post_id=post_id)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Post not found. Check the post id and try again.")
